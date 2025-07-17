@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+SQLModel
+alembic
+asyncmy          # 异步 MySQL 驱动
+greenlet         # 协程切换库，asyncmy 依赖
+pymysql          # 同步 MySQL 驱动，用于 Alembic 迁移
+pytest
+pytest-asyncio
