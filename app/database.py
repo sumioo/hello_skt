@@ -1,16 +1,12 @@
 from sqlmodel import SQLModel
-from sqlmodel.ext.asyncio.engine import create_async_engine, AsyncEngine, AsyncSession
-from sqlalchemy.ext.asyncio import AsyncSession as _AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = "mysql+asyncmy://root:qwer4321@localhost:3306/mydb"
 
-engine: AsyncEngine = create_async_engine(
-    DATABASE_URL,
-    echo=True,
-)
+engine = create_async_engine(DATABASE_URL, echo=True)
 
-async_session: sessionmaker[_AsyncSession] = sessionmaker(
+async_session = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
 )
 

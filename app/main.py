@@ -1,19 +1,11 @@
 from fastapi import FastAPI, Depends, HTTPException
 from typing import List
 from sqlmodel.ext.asyncio.session import AsyncSession
-from .database import init_db, get_session
-from .models import User, RoleEnum, StatusEnum
-from .crud import create_user, get_user, list_users, update_user_role, delete_user
-from contextlib import asynccontextmanager
+from database import get_session
+from models import User, RoleEnum, StatusEnum
+from crud import create_user, get_user, list_users, update_user_role, delete_user
 
 app = FastAPI()
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await init_db()
-    yield
-
-app = FastAPI(lifespan=lifespan)
 
 @app.post("/users/", response_model=User)
 async def api_create_user(name: str,
