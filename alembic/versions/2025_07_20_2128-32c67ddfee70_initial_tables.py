@@ -1,8 +1,8 @@
 """Initial tables
 
-Revision ID: 12c14b98ae3a
+Revision ID: 32c67ddfee70
 Revises: 
-Create Date: 2025-07-17 22:56:50.875862
+Create Date: 2025-07-20 21:28:56.779455
 
 """
 from typing import Sequence, Union
@@ -10,10 +10,10 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 import sqlmodel
-from sqlalchemy.dialects import mysql
+
 
 # revision identifiers, used by Alembic.
-revision: str = '12c14b98ae3a'
+revision: str = '32c67ddfee70'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -25,8 +25,8 @@ def upgrade() -> None:
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('status', mysql.TINYINT(unsigned=True), nullable=True, comment='0: PENDING 1: ACTIVE 2: INACTIVE'),
-    sa.Column('role', sa.String(length=50), nullable=True, comment='user: USER admin: ADMIN guest: GUEST'),
+    sa.Column('status', sa.SmallInteger(), nullable=True, comment='0: PENDING 1: ACTIVE 2: INACTIVE'),
+    sa.Column('role', sa.String(length=20), nullable=True, comment='user: USER admin: ADMIN guest: GUEST'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

@@ -1,12 +1,12 @@
 from typing import List, Optional
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from models import User, StatusEnum, RoleEnum
+from app.models import User, StatusEnum, RoleEnum
 
 async def create_user(session: AsyncSession, name: str,
                       status: StatusEnum = StatusEnum.PENDING,
                       role: RoleEnum = RoleEnum.USER) -> User:
-    user = User(name=name, status=status, role=role)
+    user = User(name=name, status=status.value, role=role.value)
     session.add(user)
     await session.commit()
     await session.refresh(user)

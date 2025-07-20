@@ -1,12 +1,17 @@
 from enum import Enum
 from typing import Optional
 from sqlmodel import SQLModel, Field
-from sqlalchemy import Column, String
-from sqlalchemy.dialects.mysql import TINYINT
+from sqlalchemy import Column, String, SmallInteger
 
 
 # 数字类型枚举
 class StatusEnum(int, Enum):
+    PENDING = 0
+    ACTIVE = 1
+    INACTIVE = 2
+
+
+class StatusEnum2(int, Enum):
     PENDING = 0
     ACTIVE = 1
     INACTIVE = 2
@@ -26,11 +31,5 @@ def enum_comment(enum: type[Enum]) -> str:
 class User(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
-    status: StatusEnum = Field(
-        default=StatusEnum.PENDING,
-        sa_column=Column(TINYINT(unsigned=True), comment=enum_comment(StatusEnum), default=StatusEnum.PENDING.value),
-    )
-    role: RoleEnum = Field(
-        default=RoleEnum.USER,
-        sa_column=Column(String(50), comment=enum_comment(RoleEnum), default=RoleEnum.USER.value),
-    )
+    status: StatusEnum = Field(default=StatusEnum.PENDING, description=f"用户状态 {enum_comment(StatusEnum)}", sa_column=Column(SmallInteger, comment=enum_comment(StatusEnum)))
+    role: RoleEnum = Field(default=RoleEnum.USER, description=f"用户角色 {enum_comment(RoleEnum)}", sa_column=Column(String(20), comment=enum_comment(RoleEnum)))
