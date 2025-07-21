@@ -1,5 +1,6 @@
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 from typing import Optional
+from pydantic import BaseModel
 
 class Hero(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -104,7 +105,7 @@ def create_heroes():
     print("Hero 2:", hero_2)
     print("Hero 3:", hero_3)
 
-class HeroOut(SQLModel):
+class HeroOut(BaseModel):
     id: int
     name: str
     age: Optional[int] = None
