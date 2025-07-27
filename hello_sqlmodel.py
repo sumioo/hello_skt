@@ -1,7 +1,19 @@
-from sqlmodel import Field, Session, SQLModel, create_engine, select, func, or_, and_, Relationship
-from sqlalchemy.orm import selectinload
 from typing import Optional
+
 from pydantic import BaseModel
+from sqlalchemy.orm import selectinload
+from sqlmodel import (
+    Field,
+    Relationship,
+    SQLModel,
+    Session,
+    and_,
+    create_engine,
+    func,
+    or_,
+    select,
+    update
+)
 
 class Team(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -24,6 +36,7 @@ class NBTeam(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     hero_links: list[HeroJoinedTeam] = Relationship(back_populates="team")
+    # nb_heros: list["Hero"] = Relationship(back_populates="nb_teams", link_model=HeroJoinedTeam)
 
 class TeacherStudent(SQLModel, table=True):
     teacher_id: int = Field(foreign_key="teacher.id", primary_key=True)
@@ -47,6 +60,7 @@ class Hero(SQLModel, table=True):
     teachers: list[Teacher] = Relationship(back_populates="students", link_model=TeacherStudent)
 
     nb_team_links: list[HeroJoinedTeam] = Relationship(back_populates="hero")
+    # nb_teams: list[NBTeam] = Relationship(back_populates="nb_heros", link_model=HeroJoinedTeam)
 
 
     def __str__(self) -> str:
@@ -98,11 +112,10 @@ def update_heros(heros):
             session.add(hero)
         session.commit()
 
-def batch_update_by_condition(update_values, condition):
-    from sqlalchemy import update
+def batch_update_by_condition(condition, update_values):
     with Session(engine) as session:
         stmt = update(Hero).where(condition).values(**update_values)
-        result = session.execute(stmt)
+        result = session.exec(stmt)
         rowcount = result.rowcount
         session.commit()
         return rowcount
@@ -395,16 +408,23 @@ def test_m2m_with_extradata():
         print("="*20, "selectinload", "="*20)
 
         hero = session.exec(
-            select(Hero)
-            .where(Hero.name == "Deadpond")
+            select(Hero).where(Hero.name == "Deadpond")
             .options(selectinload(Hero.nb_team_links).selectinload(HeroJoinedTeam.team))
         ).first()
         print("\nhero.nb_team_links:", hero.nb_team_links)
         print("\nhero.nb_team_links[0].team:", hero.nb_team_links[0].team)
 
+def test_m2m_2():
+    with Session(engine) as session:
+        hero = session.exec(select(Hero).where(Hero.name == "Deadpond")).first()
+        print("\nhero.nb_teams:", hero.nb_teams)
+
 if __name__ == "__main__":
+
+    # test_m2m_2()
+
     # test m 2 m with extra data
-    test_m2m_with_extradata()
+    # test_m2m_with_extradata()
 
     # test m 2 m select
     # test_m_2_m_related()
@@ -431,11 +451,11 @@ if __name__ == "__main__":
     # update_hero(hero)
 
     # from sqlalchemy import and_
-    # affected_rows = batch_update_by_condition(
-    #     {"age": Hero.age - 5},
-    #     and_(Hero.age != None, Hero.age > 40)
-    # )
-    # print(f"更新了 {affected_rows} 条记录")
+    affected_rows = batch_update_by_condition(
+        and_(Hero.age != None, Hero.age > 40),
+        {"age": Hero.age - 5}
+    )
+    print(f"更新了 {affected_rows} 条记录")
 
     # create_heroes()
 
@@ -468,10 +488,11 @@ if __name__ == "__main__":
     # 测试排序分页
     # test_order_by_limit_offset([Hero.id], 1, 2)
     # test_order_by_limit_offset([Hero.id.desc()], 0, 2)
-    # test_order_by_limit_offset([Hero.id.desc(), Hero.name], 0, 10)
+    # r = test_order_by_limit_offset([Hero.id.desc(), Hero.name], 0, 10)
+    # print(r)
 
     # 测试分页
-    # result = test_pagination(1, 2)
+    # result = test_pagination(2, 2)
     # print(result)
 
     # 测试使用func
