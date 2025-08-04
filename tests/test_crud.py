@@ -44,6 +44,13 @@ def event_loop():
     yield loop
     loop.close()
 
+@pytest.fixture(scope="function")
+async def user_zhang(session: AsyncSession):
+    user = await create_user(session, name="张三", status=StatusEnum.ACTIVE, role=RoleEnum.ADMIN)
+    yield user
+    # 清理
+    await delete_user(session, user.id)
+
 @pytest.mark.asyncio
 async def test_crud_operations(session: AsyncSession):
     print(session, '---------')
@@ -54,20 +61,29 @@ async def test_crud_operations(session: AsyncSession):
     assert user.status == StatusEnum.ACTIVE
     assert user.role == RoleEnum.ADMIN
 
+@pytest.mark.asyncio
+async def test_get_user(user_zhang: User, session: AsyncSession):
     # 读取
-    fetched = await get_user(session, user.id)
+    fetched = await get_user(session, user_zhang.id)
     assert fetched is not None
-    assert fetched.id == user.id
+    assert fetched.id == user_zhang.id
 
+
+@pytest.mark.asyncio
+async def test_list_users(session: AsyncSession):
     # 列表
     users = await list_users(session)
     assert len(users) >= 1
 
+@pytest.mark.asyncio
+async def test_update_user_role(user_zhang: User, session: AsyncSession):
     # 更新
-    updated = await update_user_role(session, user.id, RoleEnum.USER.value)
+    updated = await update_user_role(session, user_zhang.id, RoleEnum.USER.value)
     assert updated.role == RoleEnum.USER
 
+@pytest.mark.asyncio
+async def test_delete_user(user_zhang: User, session: AsyncSession):
     # 删除
-    deleted = await delete_user(session, user.id)
+    deleted = await delete_user(session, user_zhang.id)
     assert deleted
-    assert await get_user(session, user.id) is None
+    assert await get_user(session, user_zhang.id) is None

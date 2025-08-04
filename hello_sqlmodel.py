@@ -451,11 +451,11 @@ if __name__ == "__main__":
     # update_hero(hero)
 
     # from sqlalchemy import and_
-    affected_rows = batch_update_by_condition(
-        and_(Hero.age != None, Hero.age > 40),
-        {"age": Hero.age - 5}
-    )
-    print(f"更新了 {affected_rows} 条记录")
+    # affected_rows = batch_update_by_condition(
+    #     and_(Hero.age != None, Hero.age > 40),
+    #     {"age": Hero.age - 5}
+    # )
+    # print(f"更新了 {affected_rows} 条记录")
 
     # create_heroes()
 
@@ -496,7 +496,7 @@ if __name__ == "__main__":
     # print(result)
 
     # 测试使用func
-    # test_use_func()
+    test_use_func()
 
     # 测试使用and和前缀匹配
     # test_using_and()
