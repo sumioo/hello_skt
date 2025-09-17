@@ -6,6 +6,12 @@ from sqlalchemy.orm import sessionmaker, relationship, Session, selectinload
 from sqlalchemy.orm import declarative_base
 from pydantic import BaseModel
 
+# Alembic 迁移配置（可选）
+# 如需使用Alembic进行数据库迁移，请运行以下命令：
+# alembic init alembic
+# alembic revision --autogenerate -m "add models"
+# alembic upgrade head
+
 Base = declarative_base()
 
 class Team(Base):

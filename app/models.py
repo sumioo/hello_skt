@@ -37,3 +37,25 @@ class User(Base):
     name: str = Column(String(length=20), nullable=False)
     status: StatusEnum = Column(SmallInteger, default=StatusEnum.PENDING, comment=f"用户状态 {enum_comment(StatusEnum)}")
     role: RoleEnum = Column(String(20), default=RoleEnum.USER, comment=f"用户角色 {enum_comment(RoleEnum)}")
+
+
+
+class Team(Base):
+    __tablename__ = "team"
+
+    id: Optional[int] = Column(Integer, primary_key=True, autoincrement=True)
+    name: str = Column(String(length=20), nullable=False)
+
+
+from sqlalchemy import ForeignKey, Index
+
+class TeamMate(Base):
+    __tablename__ = "teammate"
+    __table_args__ = (
+        Index("idx_teammate_user_id_team_id", "user_id", "team_id", unique=True),
+        {"comment": "用户团队关联表"},
+    )
+
+    id: Optional[int] = Column(Integer, primary_key=True, autoincrement=True)
+    user_id: Optional[int] = Column(Integer, ForeignKey("user.id"), nullable=False)
+    team_id: Optional[int] = Column(Integer, ForeignKey("team.id"), nullable=False)
