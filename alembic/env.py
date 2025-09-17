@@ -8,8 +8,9 @@ from alembic import context
 config = context.config
 fileConfig(config.config_file_name)
 import app.models  # 导入所有 model
+from app.models import Base
 
-target_metadata = SQLModel.metadata
+target_metadata = Base.metadata
 
 # 离线迁移
 def run_migrations_offline():

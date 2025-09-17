@@ -1,8 +1,9 @@
 from enum import Enum
 from typing import Optional
-from sqlmodel import SQLModel, Field
-from sqlalchemy import Column, String, SmallInteger
+from sqlalchemy import Column, String, SmallInteger, Integer
+from sqlalchemy.orm import declarative_base
 
+Base = declarative_base()
 
 # 数字类型枚举
 class StatusEnum(int, Enum):
@@ -28,8 +29,11 @@ def enum_comment(enum: type[Enum]) -> str:
     return " ".join([f"{item.value}: {item.name}" for item in enum])
 
 
-class User(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    name: str
-    status: StatusEnum = Field(default=StatusEnum.PENDING, description=f"用户状态 {enum_comment(StatusEnum)}", sa_column=Column(SmallInteger, comment=enum_comment(StatusEnum)))
-    role: RoleEnum = Field(default=RoleEnum.USER, description=f"用户角色 {enum_comment(RoleEnum)}", sa_column=Column(String(20), comment=enum_comment(RoleEnum)))
+class User(Base):
+    __tablename__ = "user"
+
+    id: Optional[int] = Column(Integer, primary_key=True, autoincrement=True)
+    # id: Optional[str] = Column(String(length=20), nullable=False, primary_key=True)
+    name: str = Column(String(length=20), nullable=False)
+    status: StatusEnum = Column(SmallInteger, default=StatusEnum.PENDING, comment=f"用户状态 {enum_comment(StatusEnum)}")
+    role: RoleEnum = Column(String(20), default=RoleEnum.USER, comment=f"用户角色 {enum_comment(RoleEnum)}")
